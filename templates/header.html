@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang ="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Tic Tac Toe</title>
+        <meta name ="viewport" content="width=device-width, initial-scale=1">
+        <link href="{{ url_for('static', filename='bootstrap.min.css') }}" rel="stylesheet">
+        <link rel="shortcut icon" href="images/name-icon.ico">
+        <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='bootstrap.min.js') }}"></script>
+        <style>
+            body {
+                margin-top: 50px;
+                text-align: center;
+            }
+            
+            .navbar {
+                background-color: #4b0066;
+            }
+            
+            .main {
+                margin-top: 60px;
+                background-color: rgba(37, 0, 51, 0.3);
+                padding: 20px;
+            }
+            
+            p {
+                text-align: center;
+                font-size: 30px;
+            }
+            
+            a {
+                text-decoration: none;
+                color: #fff
+            }
+            
+            .board {
+                width: 500px;
+                margin: auto
+            }
+            .title {
+                margin-top: 25px;
+                padding: 30px;
+                color: #250033;
+            }
+            
+            INPUT, button {
+                background-color: #ece6ec;
+                border: none;
+                width: 150px;
+                height: 150px;
+                margin: 10px;
+            }
+            
+            form {
+                font-size: 30px;
+            }
+            
+            
+        </style>
+    </head>
+    
+    <header>
+        <nav class = "navbar navbar-inverse navbar-fixed-top">
+            <div class = "container-fluid">
+                <div class = "navbar-header">
+                    <a class = "navbar-brand" href = "/">JP.</a>
+                </div>
+            </div>
+        </nav>   
+    </header>
+        
+    <body>
+        {% block body %}
+        {% endblock %}
+    </body>
+</html>

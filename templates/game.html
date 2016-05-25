@@ -1,0 +1,58 @@
+{% extends "header.html" %}
+    
+{% block body %}
+    <div class = "title"><h1> TIC TAC TOE </h1></div>
+    <form name="form" id="form" onsubmit="return false">
+        <div class="board">
+            <div class = "row">
+                <div class = "col-md-4"><button name="button" id="button0" onclick="changeValue(0)">  </button></div>
+                <div class = "col-md-4"><button name="button" id="button1" onclick="changeValue(1)">  </button></div>
+                <div class = "col-md-4"><button name="button" id="button2" onclick="changeValue(2)">  </button></div>
+            </div>
+            <div class = "row">
+                <div class = "col-md-4"><button name="button" id="button3" onclick="changeValue(3)">  </button></div>
+                <div class = "col-md-4"><button name="button" id="button4" onclick="changeValue(4)">  </button></div>
+                <div class = "col-md-4"><button name="button" id="button5" onclick="changeValue(5)">  </button></div>
+            </div>
+            <div class = "row">
+                <div class = "col-md-4"><button name="button" id="button6" onclick="changeValue(6)">  </button></div>
+                <div class = "col-md-4"><button name="button" id="button7" onclick="changeValue(7)">  </button></div>
+                <div class = "col-md-4"><button name="button" id="button8" onclick="changeValue(8)">  </button></div>
+            </div>
+        </div>
+    </form>
+
+    <script type="text/javascript">
+        function changeValue(foo)
+        {
+            if (foo == 0) {
+                document.form.button0.innerHTML = "X";
+            }
+            else if (foo == 1) {
+                document.form.button1.innerHTML = "X";
+            }
+            else if (foo == 2) {
+                document.form.button2.innerHTML = "X";
+            }
+            else if (foo == 3) {
+                document.form.button3.innerHTML = "X";
+            }
+            else if (foo == 4) {
+                document.form.button4.innerHTML = "X";
+            }
+            else if (foo == 5) {
+                document.form.button5.innerHTML = "X";
+            }
+            else if (foo == 6) {
+                document.form.button6.innerHTML = "X";
+            }
+            else if (foo == 7) {
+                document.form.button7.innerHTML = "X";
+            }
+            else if (foo == 8) {
+                document.form.button8.innerHTML = "X";
+            }
+        }
+    </script>
+        
+{% endblock %}
