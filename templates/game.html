@@ -5,54 +5,372 @@
     <form name="form" id="form" onsubmit="return false">
         <div class="board">
             <div class = "row">
-                <div class = "col-md-4"><button name="button" id="button0" onclick="changeValue(0)">  </button></div>
-                <div class = "col-md-4"><button name="button" id="button1" onclick="changeValue(1)">  </button></div>
-                <div class = "col-md-4"><button name="button" id="button2" onclick="changeValue(2)">  </button></div>
+                <div class = "col-md-4"><button name="button" id="button0" onclick="tictactoe.changeValue(0)">  </button></div>
+                <div class = "col-md-4"><button name="button" id="button1" onclick="tictactoe.changeValue(1)">  </button></div>
+                <div class = "col-md-4"><button name="button" id="button2" onclick="tictactoe.changeValue(2)">  </button></div>
             </div>
             <div class = "row">
-                <div class = "col-md-4"><button name="button" id="button3" onclick="changeValue(3)">  </button></div>
-                <div class = "col-md-4"><button name="button" id="button4" onclick="changeValue(4)">  </button></div>
-                <div class = "col-md-4"><button name="button" id="button5" onclick="changeValue(5)">  </button></div>
+                <div class = "col-md-4"><button name="button" id="button3" onclick="tictactoe.changeValue(3)">  </button></div>
+                <div class = "col-md-4"><button name="button" id="button4" onclick="tictactoe.changeValue(4)">  </button></div>
+                <div class = "col-md-4"><button name="button" id="button5" onclick="tictactoe.changeValue(5)">  </button></div>
             </div>
             <div class = "row">
-                <div class = "col-md-4"><button name="button" id="button6" onclick="changeValue(6)">  </button></div>
-                <div class = "col-md-4"><button name="button" id="button7" onclick="changeValue(7)">  </button></div>
-                <div class = "col-md-4"><button name="button" id="button8" onclick="changeValue(8)">  </button></div>
+                <div class = "col-md-4"><button name="button" id="button6" onclick="tictactoe.changeValue(6)">  </button></div>
+                <div class = "col-md-4"><button name="button" id="button7" onclick="tictactoe.changeValue(7)">  </button></div>
+                <div class = "col-md-4"><button name="button" id="button8" onclick="tictactoe.changeValue(8)">  </button></div>
+            </div>
+            
+            <div class = "row options">
+                <div class = "col-sm-6">
+                    <button name="button" class = "opt" onclick="tictactoe.new_game()"><strong>New Game</strong></button>
+                </div>
+                <div class = "col-sm-6">
+                    <button name="button" class = "opt"><strong>Quit</strong></button>
+                </div>                
             </div>
         </div>
     </form>
 
     <script type="text/javascript">
-        function changeValue(foo)
-        {
-            if (foo == 0) {
-                document.form.button0.innerHTML = "X";
+                
+        var Board = {
+            board : [" ", " ", " ", " ", " ", " ", " ", " ", " "],
+
+            check_win : function(curr_player) {
+                var wins = (this.board[0]== curr_player & this.board[1]==curr_player & this.board[2]== curr_player) | (this.board[3] == curr_player & this.board[4]==curr_player & this.board[5]== curr_player) | (this.board[6] == curr_player & this.board[7]==curr_player & this.board[8]== curr_player) | (this.board[0]== curr_player & this.board[3]==curr_player & this.board[6]== curr_player) | (this.board[1]== curr_player & this.board[4]==curr_player & this.board[7]== curr_player) | (this.board[2]== curr_player & this.board[5]==curr_player & this.board[8]== curr_player) | (this.board[0]== curr_player & this.board[4]==curr_player & this.board[8]== curr_player) | (this.board[2]== curr_player & this.board[4]==curr_player & this.board[6]== curr_player);
+                
+                if (wins == true) {
+                    console.log("win");
+                    alert(curr_player + " wins");
+                    tictactoe.new_game();
+                }
+                
+                return wins;
+            },
+
+            check_draw : function(user, computer) {
+                if ( (this.empty_moves() == []) & (this.check_win(user) == false) & (this.checkwin(computer) == false) ) {
+                    return true;
+                } else { return false; }
+            },
+            
+            check_full_draw : function() {
+                if (this.empty_moves() == []) {
+                    console.log("draw");
+                    alert("It's a draw");
+                    return true;
+                } else {
+                    return false;
+                }
+            },
+
+            is_empty : function(node) {
+                if (this.board[node] == " ") { return true; }
+                else { return false; }
+            },
+
+            empty_moves : function() {
+                var moves = [];
+                for (var i=0; i<9; i++) {
+                    if (this.is_empty(i)) {
+                        moves.push(i);
+                    }
+                }
+                return moves;
+            },
+
+            move : function(user, node) {
+                var check_empty = this.is_empty(node);
+                if ( (node >= 0) & (node < 9) & (check_empty == true) ) {
+                    this.board[node] = user;
+                } else {
+                    console.log("choose another button")
+                }
+                
+                var win;
+                if (this.check_win(user) == true) {
+                    win = true;
+                } else {
+                    win = false;
+                }
+                console.log(this.board);
+                return [this.board, win];
+            },
+            
+            temp_move : function(user, node) {
+                var check_empty = this.is_empty(node);
+                if ( (node >= 0) & (node < 9) & (check_empty == true) ) {
+                    this.board[node] = user;
+                } else {
+                    //error
+                }
+
+                var win = this.check_win(user);
+            },
+
+            copy_temp : function() {
+                var b_buf = Board();
+                for (var i; i<9; i++) {
+                    b_buf.board[i] = this.board[i];
+                }
+
+                return b_buf;
+            },
+
+            minimax : function(node, user) {
+                this.getmaxscore = function(val) {
+                    var curr_max = -100;
+                    var best = 0;
+
+                    if (val ==[]) {
+                        return [-1, -1];
+                    }
+
+                    for (i = 0; i<val.length; i++) {
+                        curr_max = Math.max (curr_max, val[i][1]);
+                        if (val[i][1] == curr_max) {
+                            best = val[i];
+                        }
+                    }
+
+                    return best;
+                }
+
+                this.getminscore = function(val) {
+                    var curr_min = 100;
+                    best = 0
+
+                    if (val == []) {
+                        return [1,-1]
+                    }
+
+                    for (i = 0; i<val.length; i++) {
+                        curr_max = Math.min (curr_min, val[i][1]);
+                        if (val[i][1] == curr_min) {
+                            best = val[i];
+                        }
+                    }
+                    return best;
+                }
+                
+                this.max_val = function(board, node, user, computer, score, depth) {
+                    var b_buf = Board();
+                    b_buf = board.copy_temp();
+                    var m_buf = b_buf.empty_moves();
+                    var score;
+                    var val;
+                    var all_val = [];
+                    
+                    for (var i=0; i< m_buf.length; i++) {
+                        b_buf.temp_move(computer, m_buf[i]);
+                        
+                        if ( b_buf.check_win(computer) ) {
+                            score = 10-depth;
+                            val = (m_buf[i], score);
+                            all_val.push(val);
+                            b_buf.del_move(computer, m_buf[i]);
+                        }
+                        else if ( b_buf.check_draw(user,computer) ) {
+                            val = (m_buf[i], 0);
+                            all_val.push(val);
+                            b_buf.del_move(computer, m_buf[i]);
+                        }
+                        else {
+                            depth++;
+                            var buf = min_val(b_buf, m_buf[i], user, computer, score, depth);
+                            val = [ m_buf[i], buf[i] ];
+                            all_val.push(val);
+                            b_buf.del_move(computer, m_buf[i]);
+                        }
+                    }
+                    
+                    var maxscore = getmaxscore(all_val);
+                    
+                    return maxscore;
+                }
+                
+                this.min_val = function(board, node, user, computer, score, depth) {
+                    var b_buf = Board;
+                    b_buf = board.copy_temp();
+                    var m_buf = b_buf.empty_moves();
+                    var score;
+                    var val;
+                    var all_val = [];
+                    
+                    for (var i=0; i< m_buf.length; i++) {
+                        b_buf.temp_move(user, m_buf[i]);
+                        
+                        if ( b_buf.check_win(user) ) {
+                            score = depth-10;
+                            val = (m_buf[i], score);
+                            all_val.push(val);
+                            b_buf.del_move(user, m_buf[i]);
+                        }
+                        else if ( b_buf.check_draw(user,computer) ) {
+                            val = (m_buf[i], 0);
+                            all_val.push(val);
+                            b_buf.del_move(user, m_buf[i]);
+                        }
+                        else {
+                            depth++;
+                            var buf = min_val(b_buf, m_buf[i], user, computer, score, depth);
+                            val = [ m_buf[i], buf[i] ];
+                            all_val.push(val);
+                        }
+                    }
+                    
+                    var minscore = getminscore(all_val);
+                    
+                    return minscore;
+                }
+                
+                if (player == true) {
+                    user = "X";
+                    computer = "O";
+                }
+                else {
+                    user = "O";
+                    computer = "X";
+                }
+                
+                var minimax_val = this.max_val(node,user, computer, 0,0);
+                return minimax_val[0]
             }
-            else if (foo == 1) {
-                document.form.button1.innerHTML = "X";
-            }
-            else if (foo == 2) {
-                document.form.button2.innerHTML = "X";
-            }
-            else if (foo == 3) {
-                document.form.button3.innerHTML = "X";
-            }
-            else if (foo == 4) {
-                document.form.button4.innerHTML = "X";
-            }
-            else if (foo == 5) {
-                document.form.button5.innerHTML = "X";
-            }
-            else if (foo == 6) {
-                document.form.button6.innerHTML = "X";
-            }
-            else if (foo == 7) {
-                document.form.button7.innerHTML = "X";
-            }
-            else if (foo == 8) {
-                document.form.button8.innerHTML = "X";
+
+        }
+        
+        var player = true;
+        var tictactoe = {
+            changeValue : function(btn) {
+                if (btn == 0) {
+                    document.form.button0.innerHTML = "X";
+                }
+                else if (btn == 1) {
+                    document.form.button1.innerHTML = "X";
+                }
+                else if (btn == 2) {
+                    document.form.button2.innerHTML = "X";
+                }
+                else if (btn == 3) {
+                    document.form.button3.innerHTML = "X";
+                }
+                else if (btn == 4) {
+                    document.form.button4.innerHTML = "X";
+                }
+                else if (btn == 5) {
+                    document.form.button5.innerHTML = "X";
+                }
+                else if (btn == 6) {
+                    document.form.button6.innerHTML = "X";
+                }
+                else if (btn == 7) {
+                    document.form.button7.innerHTML = "X";
+                }
+                else if (btn == 8) {
+                    document.form.button8.innerHTML = "X";
+                }
+                buf = Board.move("X", btn);
+                check = buf[1];
+                
+                if ( (check == true) | (Board.check_full_draw() == true) ) {
+                    this.new_game();
+                } else {
+                    player = !player;
+                    tictactoe.comp_player(btn);
+                }
+                
+            },
+            
+            new_game : function() {
+                Board.board = [" ", " ", " ", " ", " ", " ", " ", " ", " "];
+                document.form.button0.innerHTML = " ";
+                document.form.button1.innerHTML = " ";
+                document.form.button2.innerHTML = " ";
+                document.form.button3.innerHTML = " ";
+                document.form.button4.innerHTML = " ";
+                document.form.button5.innerHTML = " ";
+                document.form.button6.innerHTML = " ";
+                document.form.button7.innerHTML = " ";
+                document.form.button8.innerHTML = " ";
+                
+            },
+            
+            choose_rand : function() {
+                rand = Math.floor( (Math.random()*8) + 1 );
+                if (Board.is_empty(rand) == false) {
+                    this.choose_rand();
+                } else {
+                    return rand;
+                }
+            },
+            
+            comp_player : function(node) {
+                player = !player;
+                //var move_ = Board.minimax(node, "X");
+                move_ = this.choose_rand();
+                console.log(move_)
+                var buf;
+                var check;
+                switch (move_) {
+                    case 0:
+                        document.getElementById("button0").innerHTML = "O";
+                        buf = Board.move("O", 0);
+                        check = buf[1];
+                        break;
+                    case 1:
+                        document.getElementById("button1").innerHTML = "O";
+                        buf = Board.move("O", 1);
+                        check = buf[1];
+                        break;
+                    case 2:
+                        document.getElementById("button2").innerHTML = "O";
+                        buf = Board.move("O", 2);
+                        check = buf[1];
+                        break;
+                    case 3:
+                        document.getElementById("button3").innerHTML = "O";
+                        buf = Board.move("O", 3);
+                        check = buf[1];
+                        break;
+                    case 4:
+                        document.getElementById("button4").innerHTML = "O";
+                        buf = Board.move("O", 4);
+                        check = buf[1];
+                        break;
+                    case 5:
+                        document.getElementById("button5").innerHTML = "O";
+                        buf = Board.move("O", 5);
+                        check = buf[1];
+                        break;
+                    case 6:
+                        document.getElementById("button6").innerHTML = "O";
+                        buf = Board.move("O", 6);
+                        check = buf[1];
+                        break;
+                    case 7:
+                        document.getElementById("button7").innerHTML = "O";
+                        buf = Board.move("O", 7);
+                        check = buf[1];
+                        break;
+                    case 8:
+                        document.getElementById("button8").innerHTML = "O";
+                        buf = Board.move("O", 8);
+                        check = buf[1];
+                        break;
+                }
+
+                if (check == true) {
+                    this.new_game();
+                } else if (Board.check_full_draw() == true) {
+                    this.new_game();
+                } else {
+                    player = !player;
+                }
             }
         }
+        
+        
+        
     </script>
         
 {% endblock %}

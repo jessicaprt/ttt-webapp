@@ -9,23 +9,7 @@ def index():
 
 @app.route('/start',  methods=['GET', 'POST'])
 def game():
-    if request.method == 'POST':
-        #button 0
-        if request.form['block0'] == "1":
-            print("hi")
-        elif request.form['block0'] == "2":
-            print("hey")
-        else:
-            b0=False
-
-        #button 1
-        '''if request.form['block1']  == " ":
-            b1=True
-        elif request.form['block1'] == "X":
-            b1=False
-        else:
-            b1=False'''
-            
+    if request.method == 'POST':            
         return render_template("game.html")
  	
     elif request.method == 'GET':
