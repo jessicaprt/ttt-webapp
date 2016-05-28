@@ -35,27 +35,39 @@
                 
         var Board = {
             board : [" ", " ", " ", " ", " ", " ", " ", " ", " "],
+            
+            temp_board : [" ", " ", " ", " ", " ", " ", " ", " ", " "],
 
             check_win : function(curr_player) {
                 var wins = (this.board[0]== curr_player & this.board[1]==curr_player & this.board[2]== curr_player) | (this.board[3] == curr_player & this.board[4]==curr_player & this.board[5]== curr_player) | (this.board[6] == curr_player & this.board[7]==curr_player & this.board[8]== curr_player) | (this.board[0]== curr_player & this.board[3]==curr_player & this.board[6]== curr_player) | (this.board[1]== curr_player & this.board[4]==curr_player & this.board[7]== curr_player) | (this.board[2]== curr_player & this.board[5]==curr_player & this.board[8]== curr_player) | (this.board[0]== curr_player & this.board[4]==curr_player & this.board[8]== curr_player) | (this.board[2]== curr_player & this.board[4]==curr_player & this.board[6]== curr_player);
                 
                 if (wins == true) {
                     console.log("win");
-                    alert(curr_player + " wins");
-                    tictactoe.new_game();
+                    //alert(curr_player + " wins");
+                    //tictactoe.new_game();
+                }
+                
+                return wins;
+            },
+            
+            check_tempwin : function(curr_player) {
+                var wins = (this.temp_board[0]== curr_player & this.temp_board[1]==curr_player & this.temp_board[2]== curr_player) | (this.temp_board[3] == curr_player & this.temp_board[4]==curr_player & this.temp_board[5]== curr_player) | (this.temp_board[6] == curr_player & this.temp_board[7]==curr_player & this.temp_board[8]== curr_player) | (this.temp_board[0]== curr_player & this.temp_board[3]==curr_player & this.temp_board[6]== curr_player) | (this.temp_board[1]== curr_player & this.temp_board[4]==curr_player & this.temp_board[7]== curr_player) | (this.temp_board[2]== curr_player & this.temp_board[5]==curr_player & this.temp_board[8]== curr_player) | (this.temp_board[0]== curr_player & this.temp_board[4]==curr_player & this.temp_board[8]== curr_player) | (this.temp_board[2]== curr_player & this.temp_board[4]==curr_player & this.temp_board[6]== curr_player);
+                
+                if (wins == true) {
+                    console.log("win");
                 }
                 
                 return wins;
             },
 
             check_draw : function(user, computer) {
-                if ( (this.empty_moves() == []) & (this.check_win(user) == false) & (this.checkwin(computer) == false) ) {
+                if ( (this.empty_moves(1) == []) & (this.check_tempwin(user) == false) & (this.check_tempwin(computer) == false) ) {
                     return true;
                 } else { return false; }
             },
             
             check_full_draw : function() {
-                if (this.empty_moves() == []) {
+                if (this.empty_moves(0) == []) {
                     console.log("draw");
                     alert("It's a draw");
                     return true;
@@ -64,15 +76,21 @@
                 }
             },
 
-            is_empty : function(node) {
-                if (this.board[node] == " ") { return true; }
-                else { return false; }
+            is_empty : function(node, mode) {
+                if (mode == 0) {
+                    if (this.board[node] == " ") { return true; }
+                    else { return false; }
+                } else {
+                    if (this.temp_board[node] == " ") { return true; }
+                    else { return false; }
+                }
+                
             },
 
-            empty_moves : function() {
+            empty_moves : function(mode) {
                 var moves = [];
                 for (var i=0; i<9; i++) {
-                    if (this.is_empty(i)) {
+                    if (this.is_empty(i, mode)) {
                         moves.push(i);
                     }
                 }
@@ -80,7 +98,7 @@
             },
 
             move : function(user, node) {
-                var check_empty = this.is_empty(node);
+                var check_empty = this.is_empty(node,0);
                 if ( (node >= 0) & (node < 9) & (check_empty == true) ) {
                     this.board[node] = user;
                 } else {
@@ -89,6 +107,7 @@
                 
                 var win;
                 if (this.check_win(user) == true) {
+                    alert(user + " wins!");
                     win = true;
                 } else {
                     win = false;
@@ -98,9 +117,9 @@
             },
             
             temp_move : function(user, node) {
-                var check_empty = this.is_empty(node);
+                var check_empty = this.is_empty(node,1);
                 if ( (node >= 0) & (node < 9) & (check_empty == true) ) {
-                    this.board[node] = user;
+                    this.temp_board[node] = user;
                 } else {
                     //error
                 }
@@ -109,132 +128,150 @@
             },
 
             copy_temp : function() {
-                var b_buf = Board();
+                var b_buf = [" ", " ", " ", " ", " ", " ", " ", " ", " "];
                 for (var i; i<9; i++) {
                     b_buf.board[i] = this.board[i];
                 }
-
                 return b_buf;
+            },
+            
+            del_move : function(player, node) {
+                var check_empty = this.is_empty(node,1);
+                if ( (node >= 0) & (node < 9) & (check_empty == false) ) {
+                    this.temp_board[node] = " ";
+                }
             },
 
             minimax : function(node, user) {
-                this.getmaxscore = function(val) {
+                var val = [];
+                var all_val = [];
+                this.getmaxscore = function(bufval) {
+                    var bufval = bufval;
                     var curr_max = -100;
-                    var best = 0;
+                    var best = -100;
 
-                    if (val ==[]) {
+                    if (bufval == []) {
                         return [-1, -1];
                     }
 
-                    for (i = 0; i<val.length; i++) {
-                        curr_max = Math.max (curr_max, val[i][1]);
-                        if (val[i][1] == curr_max) {
-                            best = val[i];
+                    for (var i = 0; i<bufval.length; i++) {
+                        curr_max = Math.max (curr_max, bufval[i][1]);
+                        if (bufval[i][1] == curr_max) {
+                            best = bufval[i];
                         }
                     }
-
+                    console.log("best1: " + best);
                     return best;
                 }
 
-                this.getminscore = function(val) {
+                this.getminscore = function(bufval) {
+                    var bufval = bufval;
                     var curr_min = 100;
-                    best = 0
+                    var best = -100;
 
-                    if (val == []) {
+                    if (bufval == []) {
                         return [1,-1]
                     }
 
-                    for (i = 0; i<val.length; i++) {
-                        curr_max = Math.min (curr_min, val[i][1]);
-                        if (val[i][1] == curr_min) {
-                            best = val[i];
+                    for (var i = 0; i<bufval.length; i++) {
+                        curr_max = Math.min (curr_min, bufval[i][1]);
+                        if (bufval[i][1] == curr_min) {
+                            best = bufval[i];
                         }
                     }
+                    console.log("best2: " + best);
                     return best;
                 }
                 
-                this.max_val = function(board, node, user, computer, score, depth) {
-                    var b_buf = Board();
-                    b_buf = board.copy_temp();
-                    var m_buf = b_buf.empty_moves();
-                    var score;
-                    var val;
-                    var all_val = [];
+                this.max_val = function(node, user, computer, score, depth) {
+                    //console.log("main: " + this.board);
+                    //console.log("b_buf: " + this.temp_board);
+                    var m_buf = this.empty_moves(1);
+                    //console.log("m: " + m_buf);
+                    var score = score;
+                    console.log("score: " + score);
+                    var depth = depth;
+                    console.log("depth: " + depth);
+                    all_val = [];
                     
                     for (var i=0; i< m_buf.length; i++) {
-                        b_buf.temp_move(computer, m_buf[i]);
+                        this.temp_move(computer, m_buf[i]);
                         
-                        if ( b_buf.check_win(computer) ) {
+                        if ( this.check_tempwin("O") ) {
                             score = 10-depth;
-                            val = (m_buf[i], score);
+                            val = [ m_buf[i], score ];
+                            console.log("_val_: " + val);
                             all_val.push(val);
-                            b_buf.del_move(computer, m_buf[i]);
+                            this.del_move("O", m_buf[i]);
                         }
-                        else if ( b_buf.check_draw(user,computer) ) {
-                            val = (m_buf[i], 0);
+                        else if ( this.check_draw("X","O") ) {
+                            val = [ m_buf[i], 0 ];
                             all_val.push(val);
-                            b_buf.del_move(computer, m_buf[i]);
+                            this.del_move("O", m_buf[i]);
                         }
                         else {
                             depth++;
-                            var buf = min_val(b_buf, m_buf[i], user, computer, score, depth);
+                            var buf = this.min_val(m_buf[i], "X", "O", score, depth);
                             val = [ m_buf[i], buf[i] ];
                             all_val.push(val);
-                            b_buf.del_move(computer, m_buf[i]);
+                            this.del_move("O", m_buf[i]);
                         }
                     }
-                    
-                    var maxscore = getmaxscore(all_val);
-                    
+                    console.log("val: " + all_val);
+                    var maxscore = this.getmaxscore(all_val);
                     return maxscore;
                 }
                 
-                this.min_val = function(board, node, user, computer, score, depth) {
-                    var b_buf = Board;
-                    b_buf = board.copy_temp();
-                    var m_buf = b_buf.empty_moves();
-                    var score;
-                    var val;
-                    var all_val = [];
+                this.min_val = function(node, user, computer, score, depth) {
+                    //console.log("main: " + this.board);
+                    //console.log("b_buf: " + this.temp_board);
+                    var m_buf = this.empty_moves(1);
+                    //console.log("m: " + m_buf);
+                    var score = score;
+                    var depth = depth;
+                    all_val = [];
                     
                     for (var i=0; i< m_buf.length; i++) {
-                        b_buf.temp_move(user, m_buf[i]);
+                        this.temp_move("X", m_buf[i]);
                         
-                        if ( b_buf.check_win(user) ) {
+                        if ( this.check_tempwin("X") ) {
                             score = depth-10;
-                            val = (m_buf[i], score);
+                            val = [ m_buf[i], score ];
                             all_val.push(val);
-                            b_buf.del_move(user, m_buf[i]);
+                            this.del_move("X", m_buf[i]);
                         }
-                        else if ( b_buf.check_draw(user,computer) ) {
-                            val = (m_buf[i], 0);
+                        else if ( this.check_draw("X","O") ) {
+                            val = [ m_buf[i], 0 ];
                             all_val.push(val);
-                            b_buf.del_move(user, m_buf[i]);
+                            this.del_move("X", m_buf[i]);
                         }
                         else {
                             depth++;
-                            var buf = min_val(b_buf, m_buf[i], user, computer, score, depth);
+                            var buf = this.max_val(m_buf[i], "X","O", score, depth);
                             val = [ m_buf[i], buf[i] ];
                             all_val.push(val);
                         }
                     }
                     
-                    var minscore = getminscore(all_val);
+                    var minscore = this.getminscore(all_val);
                     
                     return minscore;
                 }
                 
-                if (player == true) {
+                /*if (player == true) {
                     user = "X";
                     computer = "O";
                 }
                 else {
                     user = "O";
                     computer = "X";
-                }
+                }*/
                 
-                var minimax_val = this.max_val(node,user, computer, 0,0);
-                return minimax_val[0]
+                var minimax_val = this.max_val(node,"X", "O", 0,0);
+                console.log("hey");
+                console.log(minimax_val);
+                this.temp_board = this.board;
+                return minimax_val[0];
             }
 
         }
@@ -297,7 +334,7 @@
             
             choose_rand : function() {
                 rand = Math.floor( (Math.random()*8) + 1 );
-                if (Board.is_empty(rand) == false) {
+                if (Board.is_empty(rand,0) == false) {
                     this.choose_rand();
                 } else {
                     return rand;
@@ -306,8 +343,8 @@
             
             comp_player : function(node) {
                 player = !player;
-                //var move_ = Board.minimax(node, "X");
-                move_ = this.choose_rand();
+                var move_ = Board.minimax(node, "X");
+                //move_ = this.choose_rand();
                 console.log(move_)
                 var buf;
                 var check;
