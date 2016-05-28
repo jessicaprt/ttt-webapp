@@ -101,6 +101,7 @@
                 var check_empty = this.is_empty(node,0);
                 if ( (node >= 0) & (node < 9) & (check_empty == true) ) {
                     this.board[node] = user;
+                    this.temp_board[node] = user;
                 } else {
                     console.log("choose another button")
                 }
@@ -112,7 +113,7 @@
                 } else {
                     win = false;
                 }
-                console.log(this.board);
+                console.log("hi: " + this.board);
                 return [this.board, win];
             },
             
@@ -124,16 +125,16 @@
                     //error
                 }
 
-                var win = this.check_win(user);
+                var win = this.check_tempwin(user);
             },
 
-            copy_temp : function() {
+            /*copy_temp : function() {
                 var b_buf = [" ", " ", " ", " ", " ", " ", " ", " ", " "];
                 for (var i; i<9; i++) {
                     b_buf.board[i] = this.board[i];
                 }
                 return b_buf;
-            },
+            }, */
             
             del_move : function(player, node) {
                 var check_empty = this.is_empty(node,1);
@@ -184,8 +185,8 @@
                 }
                 
                 this.max_val = function(node, user, computer, score, depth) {
-                    //console.log("main: " + this.board);
-                    //console.log("b_buf: " + this.temp_board);
+                    console.log("main: " + this.board);
+                    console.log("b_buf: " + this.temp_board);
                     var m_buf = this.empty_moves(1);
                     //console.log("m: " + m_buf);
                     var score = score;
@@ -223,8 +224,8 @@
                 }
                 
                 this.min_val = function(node, user, computer, score, depth) {
-                    //console.log("main: " + this.board);
-                    //console.log("b_buf: " + this.temp_board);
+                    console.log("main: " + this.board);
+                    console.log("b_buf: " + this.temp_board);
                     var m_buf = this.empty_moves(1);
                     //console.log("m: " + m_buf);
                     var score = score;
@@ -320,6 +321,7 @@
             
             new_game : function() {
                 Board.board = [" ", " ", " ", " ", " ", " ", " ", " ", " "];
+                Board.temp_board = [" ", " ", " ", " ", " ", " ", " ", " ", " "];
                 document.form.button0.innerHTML = " ";
                 document.form.button1.innerHTML = " ";
                 document.form.button2.innerHTML = " ";
@@ -394,6 +396,8 @@
                         buf = Board.move("O", 8);
                         check = buf[1];
                         break;
+                    defalt:
+                        alert("switch error");
                 }
 
                 if (check == true) {
